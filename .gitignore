@@ -1,0 +1,33 @@
+# Environment variables
+.env
+
+# Data directories
+postgres_data/
+postgres_data_pipeline/
+data/
+*.csv
+*.json
+
+# Airflow
+airflow/logs/
+airflow/__pycache__/
+airflow/**/__pycache__/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

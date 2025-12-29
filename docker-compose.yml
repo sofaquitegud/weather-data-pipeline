@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_pipeline:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U de_user -d weather_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  airflow:
+    image: apache/airflow:2.9.3
+    container_name: airflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://de_user:de_password@postgres:5432/weather_db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+      - airflow_logs:/opt/airflow/logs
+      - ./airflow/requirements.txt:/requirements.txt
+      - ./ingestion:/opt/airflow/ingestion
+      - ./transformation:/opt/airflow/transformation
+    ports:
+      - "8080:8080"
+    entrypoint: []
+    command:
+      - bash
+      - -c
+      - |
+        pip install -r /requirements.txt
+        airflow db migrate
+        airflow users create --username admin --password admin --firstname admin --lastname admin --role Admin --email admin@example.com || true
+        airflow webserver & airflow scheduler
+
+volumes:
+  postgres_data_pipeline:
+  airflow_logs:
