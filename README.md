@@ -48,7 +48,8 @@ data-engineering-pipeline/
 
 1. Clone the repository:
 ```bash
-cd /home/syfqfrhnn/projects/data-engineering-pipeline
+git clone https://github.com/sofaquitegud/weather-data-pipeline.git
+cd weather-data-pipeline
 ```
 
 2. Start the services:
